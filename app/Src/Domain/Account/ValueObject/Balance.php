@@ -1,13 +1,15 @@
 <?php 
 
+namespace Src\Domain\Account\ValueObject;
+
 class Balance {
     public function __construct(
-        private int $value
+        public int $value
     ) {}
 
     public function debit(int $value): void {
         if ($this->value < $value) {
-            throw new Exception('Saldo insuficiente');
+            throw new \Exception('Saldo insuficiente');
         }
 
         $this->value -= $value;

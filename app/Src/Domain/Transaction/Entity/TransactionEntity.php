@@ -1,10 +1,12 @@
 <?php
 
+namespace Src\Domain\Transaction\Entity;
+
 class TransactionEntity {
     public function __construct(
-        private string $type,
-        private float $value,
-        private \DateTime $createdAt,
-        private string $description
+        public string $type,
+        public float $value,
+        public \DateTime $createdAt,
+        public string $description
     ) {}
 }
