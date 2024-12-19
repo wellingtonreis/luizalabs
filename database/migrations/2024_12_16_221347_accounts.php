@@ -14,7 +14,6 @@ return new class extends Migration
             $table->decimal('balance', 8, 2);
             $table->decimal('limit_credit', 8, 2);
             $table->timestamp('created_at');
-            $table->foreignId('id_transaction')->constrained('transactions');
         });
     }
 

@@ -11,6 +11,7 @@ class Transaction extends Model
 
     protected $table = 'transactions';
     protected $fillable = [
+        'number_account',
         'type',
         'value',
         'created_at',
@@ -20,4 +21,9 @@ class Transaction extends Model
     public $timestamps = true;
 
     const UPDATED_AT = null;
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'number_account', 'number_account');
+    }
 }

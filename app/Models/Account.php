@@ -15,7 +15,6 @@ class Account extends Model
         'balance',
         'limit_credit',
         'created_at',
-        'idTransaction',
     ];
 
     public $timestamps = true;
@@ -24,6 +23,6 @@ class Account extends Model
 
     public function transaction()
     {
-        return $this->belongsTo(Transaction::class, 'idTransaction');
+        return $this->hasMany(Transaction::class, 'number_account', 'number_account');
     }
 }

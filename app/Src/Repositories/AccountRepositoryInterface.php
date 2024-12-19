@@ -1,8 +1,8 @@
 <?php 
 
-namespace Src\Repositories;
+namespace App\Src\Repositories;
 
-use Src\Domain\Account\Entity\AccountEntity;
+use App\Src\Domain\Account\Entity\AccountEntity;
 
 interface AccountRepositoryInterface {
     public function findByAccount(int $numberAccount): AccountEntity;

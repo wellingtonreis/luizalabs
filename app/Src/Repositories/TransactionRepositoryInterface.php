@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Repositories;
+namespace App\Src\Repositories;
 
-use Src\Domain\Transaction\Entity\TransactionEntity;
+use App\Src\Domain\Transaction\Entity\TransactionEntity;
 
 interface TransactionRepositoryInterface {
     public function save(TransactionEntity $transaction): void;

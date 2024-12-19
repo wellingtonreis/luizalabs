@@ -1,6 +1,6 @@
 <?php 
 
-namespace Src\Domain\Account\ValueObject;
+namespace App\Src\Domain\Account\ValueObject;
 
 class Balance {
     public function __construct(

@@ -1,6 +1,6 @@
 <?php 
 
-namespace Src\UseCases;
+namespace App\Src\UseCases;
 
 class Response {
     

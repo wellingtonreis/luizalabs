@@ -1,10 +1,12 @@
 <?php
 
-namespace Src\UseCases;
+namespace App\Src\UseCases;
 
-use Src\Domain\Transaction\Entity\TransactionEntity;
-use Src\Repositories\AccountRepositoryInterface;
-use Src\Repositories\TransactionRepositoryInterface;
+use App\Src\UseCases\Dto\TransferFunds\TransferFundsDto;
+use App\Src\Domain\Account\Entity\AccountEntity;
+use App\Src\Domain\Transaction\Entity\TransactionEntity;
+use App\Src\Repositories\AccountRepositoryInterface;
+use App\Src\Repositories\TransactionRepositoryInterface;
 
 class TransferFunds {
     public function __construct(
@@ -12,29 +14,70 @@ class TransferFunds {
         private TransactionRepositoryInterface $transactionRepository
     ) {}
 
-    public function execute(InputAccountDto $inputAccountDto): Response {
-
+    public function execute(TransferFundsDto $transferFundsDto): Response {
         try {
-            $accountOrigin = $this->accountRepository->findByAccount($inputAccountDto->getNumberAccount());
-            $accountDestination = $this->accountRepository->findByAccount($inputAccountDto->getNumberAccount());
-    
-            $accountOrigin->balance->debit($inputAccountDto->balance->value);
-            $accountDestination->balance->credit($inputAccountDto->balance->value);
-    
-            $transactionEntity = new TransactionEntity(
-                $inputAccountDto->transaction->type,
-                $inputAccountDto->transaction->value,
-                $inputAccountDto->transaction->createdAt,
-                $inputAccountDto->transaction?->description ?? ''
-            );
-    
+            $accountOrigin = $this->origin($transferFundsDto);
+            $accountDestination = $this->destination($transferFundsDto);
+            
             $this->accountRepository->save($accountOrigin);
+            $this->transaction(
+                $accountOrigin->getNumberAccount(),
+                $transferFundsDto->getType(),
+                $transferFundsDto->getValue(),
+                $transferFundsDto->getDescription() 
+            );
+
             $this->accountRepository->save($accountDestination);
-            $this->transactionRepository->save($transactionEntity);
+            $this->transaction(
+                $accountDestination->getNumberAccount(),
+                $transferFundsDto->getType(),
+                $transferFundsDto->getValue(),
+                $transferFundsDto->getDescription()
+            );
             
             return Response::success('Transferência realizada com sucesso!');
         } catch (\Exception $e) {
             return Response::error('Erro ao realizar transferência!');
         }
+    }
+
+    private function origin(TransferFundsDto $transferFundsDto): AccountEntity {
+        $accountOrigin = $this->accountRepository->findByAccount(
+            $transferFundsDto->getNumberAccountOrigin()
+        );
+
+        $accountOrigin->limitCredit()->debit($transferFundsDto->getValue());
+        return new AccountEntity(
+            $accountOrigin->numberAccount,
+            $accountOrigin->balance,
+            $accountOrigin->limitCredit,
+            $accountOrigin->createdAt,
+        );
+    }
+
+    private function destination(TransferFundsDto $transferFundsDto): AccountEntity {
+        $accountDestination = $this->accountRepository->findByAccount(
+            $transferFundsDto->getNumberAccountDestination()
+        );
+        
+        $accountDestination->balance->credit($transferFundsDto->getValue());
+        return new AccountEntity(
+            $accountDestination->numberAccount,
+            $accountDestination->balance,
+            $accountDestination->limitCredit,
+            $accountDestination->createdAt,
+        );
+    }
+
+    private function transaction(int $numberAccount, string $type, float $value, string $description): void {
+        $transactionEntity = new TransactionEntity(
+            $numberAccount,
+            $type,
+            $value,
+            new \DateTime(),
+            $description
+        );
+
+        $this->transactionRepository->save($transactionEntity);
     }
 }
