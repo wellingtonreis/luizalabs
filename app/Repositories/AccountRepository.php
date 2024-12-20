@@ -17,8 +17,7 @@ class AccountRepository implements AccountRepositoryInterface
 
         return new AccountEntity(
             $account->number_account,
-            new Balance($account->balance),
-            $account->limit_credit,
+            new Balance($account->balance, $account->limit_credit),
             $account->created_at,
         );
     }
@@ -26,8 +25,7 @@ class AccountRepository implements AccountRepositoryInterface
     public function save(AccountEntity $accountEntity): void
     {
         $this->model->where('number_account', $accountEntity->numberAccount)->update([
-            'balance' => $accountEntity->balance,
-            'limit_credit' => $accountEntity->limitCredit,
+            'balance' => $accountEntity->balance->value,
             'created_at' => $accountEntity->createdAt,
         ]);
     }

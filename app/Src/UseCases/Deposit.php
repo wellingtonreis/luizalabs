@@ -8,7 +8,7 @@ use App\Src\Domain\Transaction\Entity\TransactionEntity;
 use App\Src\Repositories\AccountRepositoryInterface;
 use App\Src\Repositories\TransactionRepositoryInterface;
 
-class TransferFunds {
+class Deposit {
     public function __construct(
         private AccountRepositoryInterface $accountRepository,
         private TransactionRepositoryInterface $transactionRepository
@@ -17,7 +17,6 @@ class TransferFunds {
     public function execute(TransferFundsDto $transferFundsDto): Response {
         try {
             $accountOrigin = $this->origin($transferFundsDto);
-            $accountDestination = $this->destination($transferFundsDto);
 
             $this->accountRepository->save($accountOrigin);
             $this->transaction(
@@ -25,14 +24,6 @@ class TransferFunds {
                 $transferFundsDto->getType(),
                 $transferFundsDto->getValue(),
                 $transferFundsDto->getDescription() 
-            );
-            
-            $this->accountRepository->save($accountDestination);
-            $this->transaction(
-                $accountDestination->getNumberAccount(),
-                $transferFundsDto->getType(),
-                $transferFundsDto->getValue(),
-                $transferFundsDto->getDescription()
             );
 
             return Response::success('Transferência realizada com sucesso!');
@@ -52,19 +43,6 @@ class TransferFunds {
             $accountOrigin->numberAccount,
             $accountOrigin->balance,
             $accountOrigin->createdAt,
-        );
-    }
-
-    private function destination(TransferFundsDto $transferFundsDto): AccountEntity {
-        $accountDestination = $this->accountRepository->findByAccount(
-            $transferFundsDto->getNumberAccountDestination()
-        );
-        
-        $accountDestination->balance->credit($transferFundsDto->getValue());
-        return new AccountEntity(
-            $accountDestination->numberAccount,
-            $accountDestination->balance,
-            $accountDestination->createdAt,
         );
     }
 
