@@ -1,0 +1,11 @@
+POST http://localhost:8000/api/v1/withdraw HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Accept: application/json
+
+{
+    "numberAccountOrigin": "32821498",
+    "value": 1000,
+    "type": "withdraw",
+    "description": "Sacando dinheiro"
+}

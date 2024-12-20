@@ -1,0 +1,12 @@
+POST http://localhost:8000/api/v1/transfer-funds HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Accept: application/json
+
+{
+    "numberAccountOrigin": "92816513",
+    "numberAccountDestination": "70670055",
+    "value": 1000,
+    "type": "transfer",
+    "description": "Transferindo dinheiro"
+}

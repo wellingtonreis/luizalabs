@@ -37,7 +37,6 @@ class TransferFunds {
 
             return Response::success('Transferência realizada com sucesso!');
         } catch (\Exception $e) {
-            dump($e->getMessage());
             return Response::error('Erro ao realizar transferência!');
         }
     }
