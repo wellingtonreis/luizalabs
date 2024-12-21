@@ -8,13 +8,15 @@ class Balance {
         public float $limitCredit,
     ) {}
 
-    public function debit(float $value): void {
+    public function debit(float $value, float $feePercentage = 0.0): void {
+
+        $totalDebit = $value + $this->calculateFee($value, $feePercentage);
         
-        if ($this->limitCredit() < $value) {
+        if ($this->limitCredit() < $totalDebit) {
             throw new \Exception('Saldo insuficiente');
         }
 
-        $this->value -= $value;
+        $this->value -= $totalDebit;
     }
 
     public function credit(float $value): void {
@@ -33,5 +35,9 @@ class Balance {
             throw new \Exception('Limite de crédito excedido');
         }
         return true;
+    }
+
+    private function calculateFee(float $value, float $percentage): float {
+        return $value * ($percentage / 100);
     }
 }

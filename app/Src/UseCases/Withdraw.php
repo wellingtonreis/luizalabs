@@ -39,7 +39,10 @@ class Withdraw {
             $WithdrawDto->getNumberAccountOrigin()
         );
 
-        $accountOrigin->balance->debit($WithdrawDto->getValue());
+        $accountOrigin->balance->debit(
+            $WithdrawDto->getValue(),
+            $accountOrigin->feeGenerate()
+        );
         return new AccountEntity(
             $accountOrigin->numberAccount,
             $accountOrigin->balance,

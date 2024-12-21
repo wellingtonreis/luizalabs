@@ -7,15 +7,19 @@ use App\Src\Domain\Account\Entity\AccountEntity;
 use App\Src\Domain\Transaction\Entity\TransactionEntity;
 use App\Src\Repositories\AccountRepositoryInterface;
 use App\Src\Repositories\TransactionRepositoryInterface;
+use App\Src\Repositories\UnitOfWorkInterface;
 
 class TransferFunds {
     public function __construct(
         private AccountRepositoryInterface $accountRepository,
-        private TransactionRepositoryInterface $transactionRepository
+        private TransactionRepositoryInterface $transactionRepository,
+        private UnitOfWorkInterface $unitOfWork
     ) {}
 
     public function execute(TransferFundsDto $transferFundsDto): Response {
         try {
+            $this->unitOfWork->begin();
+
             $accountOrigin = $this->origin($transferFundsDto);
             $accountDestination = $this->destination($transferFundsDto);
 
@@ -35,8 +39,11 @@ class TransferFunds {
                 $transferFundsDto->getDescription()
             );
 
+            $this->unitOfWork->commit();
             return Response::success('Transferência realizada com sucesso!');
         } catch (\Exception $e) {
+
+            $this->unitOfWork->rollback();
             return Response::error('Erro ao realizar transferência!');
         }
     }
@@ -46,7 +53,11 @@ class TransferFunds {
             $transferFundsDto->getNumberAccountOrigin()
         );
 
-        $accountOrigin->balance->debit($transferFundsDto->getValue());
+        $accountOrigin->balance->debit(
+            $transferFundsDto->getValue(), 
+            $accountOrigin->feeGenerate()
+        );
+        
         return new AccountEntity(
             $accountOrigin->numberAccount,
             $accountOrigin->balance,
