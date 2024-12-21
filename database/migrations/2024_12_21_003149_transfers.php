@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('number_account_origin');
             $table->string('number_account_destination');
             $table->decimal('amount', 15, 2);
+            $table->enum('type', ['transfer', 'deposit', 'withdraw']);
             $table->string('description')->nullable();
             $table->timestamps();
         });

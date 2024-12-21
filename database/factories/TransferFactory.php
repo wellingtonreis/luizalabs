@@ -26,6 +26,7 @@ class TransferFactory extends Factory
             'number_account_origin' => $originAccount->number_account,
             'number_account_destination' => $destinationAccount->number_account,
             'amount' => $transferAmount,
+            'type' => $this->faker->randomElement(['deposit', 'withdraw', 'transfer']),
             'description' => $this->faker->sentence(),
             'created_at' => now(),
         ];

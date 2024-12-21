@@ -1,3 +1,12 @@
+start-app:
+	docker exec -it laravel-app /bin/bash -c "php artisan migrate && php artisan db:seed && exit"
+
+start-job:
+	docker exec -it laravel-app /bin/bash -c "php artisan queue:work --queue=rabbitmq --once && exit"
+
+generante-transfers:
+	docker exec -it laravel-app /bin/bash -c "php artisan db:seed && exit"
+
 test:
 	./vendor/bin/phpunit
 
@@ -24,3 +33,6 @@ route-clear:
 
 view-clear:
 	php artisan view:clear
+
+view-logs:
+	docker exec -it laravel-app /bin/bash -c "tail -f storage/logs/laravel.log"

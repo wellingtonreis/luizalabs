@@ -8,22 +8,48 @@ services:
     container_name: laravel-app
     ports:
       - "8000:8000"
+    networks:
+      - external_network
     volumes:
       - .:/var/www/html
     depends_on:
-      - postgres
+      - mysql
 
-  postgres:
-    image: postgres:13
-    container_name: postgres
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    networks:
+      - external_network
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - ./infra/data/mysql:/var/lib/mysql
     environment:
-      POSTGRES_USER: laravel
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: laravel
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - external_network
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - ./infra/data/rabbitmq:/var/lib/rabbitmq
+      - ./infra/config/rabbitmq/definitions:/etc/rabbitmq/definitions
+    entrypoint: [ "bash", "-c", "rabbitmq-server -detached; sleep 10; rabbitmqctl import_definitions /etc/rabbitmq/definitions/definitions.json; rabbitmqctl stop; rabbitmq-server" ]
 
 volumes:
-  postgres-data:
+  mysql-data:
+
+networks:
+  external_network:
+    external: true

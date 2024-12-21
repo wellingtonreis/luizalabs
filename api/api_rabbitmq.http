@@ -1,0 +1,11 @@
+GET http://localhost:8000/api/v1/send-transfer-message-to-rabbitmq HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Accept: application/json
+
+###
+
+GET http://localhost:8000/api/v1/consume-transfer-messages HTTP/1.1
+Host: localhost:8000
+Content-Type: application/json
+Accept: application/json
