@@ -36,3 +36,6 @@ view-clear:
 
 view-logs:
 	docker exec -it laravel-app /bin/bash -c "tail -f storage/logs/laravel.log"
+
+logs-clear:
+	docker exec -it laravel-app /bin/bash -c "truncate -s 0 storage/logs/laravel.log"

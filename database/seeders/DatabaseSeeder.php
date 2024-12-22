@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Account;
 use Database\Factories\TransactionFactory;
 use Database\Factories\TransferFactory;
 use Illuminate\Database\Seeder;
@@ -10,7 +11,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        TransactionFactory::new()->count(10)->create();
-        TransferFactory::new()->count(100)->create();
+        Account::factory()->count(1000)->create();
+        // TransactionFactory::new()->count(1000)->create();
+        TransferFactory::new()->count(10000)->create();
     }
 }

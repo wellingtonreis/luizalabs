@@ -23,27 +23,41 @@ class TransferFunds {
             $accountOrigin = $this->origin($transferFundsDto);
             $accountDestination = $this->destination($transferFundsDto);
 
+            // REALIZA DÉBITO NA CONTA ORIGEM
             $this->accountRepository->save($accountOrigin);
-            $this->transaction(
+            // SALVA TRANSAÇÃO NA CONTA ORIGEM
+            $transAccount = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
                 $transferFundsDto->getType(),
-                $transferFundsDto->getValue(),
-                $transferFundsDto->getDescription() 
+                $transferFundsDto->getValue()
             );
+            $transAccount->setDescription($transferFundsDto->getType());
+            $this->transactionRepository->save($transAccount);
             
+            // REALIZA CRÉDITO NA CONTA DESTINO
             $this->accountRepository->save($accountDestination);
-            $this->transaction(
+            // SALVA TRANSAÇÃO NA CONTA DESTINO
+            $transDestination = TransactionEntity::transaction(
                 $accountDestination->getNumberAccount(),
                 $transferFundsDto->getType(),
-                $transferFundsDto->getValue(),
-                $transferFundsDto->getDescription()
+                $transferFundsDto->getValue()
             );
+            $transDestination->setDescription($transferFundsDto->getType());
+            $this->transactionRepository->save($transDestination);
 
             $this->unitOfWork->commit();
             return Response::success('Transferência realizada com sucesso!');
         } catch (\Exception $e) {
 
             $this->unitOfWork->rollback();
+
+            // SALVA TRANSAÇÃO NA CONTA ORIGEM COM A EXCEÇÃO
+            TransactionEntity::transaction(
+                $transferFundsDto->getNumberAccountOrigin(),
+                'transfer',
+                $transferFundsDto->getValue(),
+                $e->getMessage()
+            );
             return Response::error('Erro ao realizar transferência!');
         }
     }
@@ -76,17 +90,5 @@ class TransferFunds {
             $accountDestination->balance,
             $accountDestination->createdAt,
         );
-    }
-
-    private function transaction(int $numberAccount, string $type, float $value, string $description): void {
-        
-        $transactionEntity = new TransactionEntity(
-            $numberAccount,
-            $type,
-            $value,
-            new \DateTime(),
-            $description
-        );
-        $this->transactionRepository->save($transactionEntity);
     }
 }

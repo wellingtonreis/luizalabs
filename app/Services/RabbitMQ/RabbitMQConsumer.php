@@ -7,25 +7,27 @@ use Illuminate\Support\Facades\Queue;
 
 class RabbitMQConsumer
 {
-    private const BATCH_SIZE = 100;
+    private const BATCH_SIZE = 1000;
     private array $buffer = [];
+
+    public function __construct(
+        private string $exchange,
+        private string $queue,
+        private string $key
+    ){}
 
     public function consume(callable $callback, callable $onComplete = null): void
     {
         $connection = Queue::connection('rabbitmq')->getConnection();
         $channel = $connection->channel();
 
-        $exchange = env('RABBITMQ_EXCHANGE');
-        $queue = env('RABBITMQ_QUEUE');
-        $routingKey = env('RABBITMQ_QUEUE');
-
-        $channel->exchange_declare($exchange, 'direct', false, true, false);
+        $channel->exchange_declare($this->exchange, 'direct', false, true, false);
         $arguments = ['x-queue-mode' => ['S', 'lazy']];
-        $channel->queue_declare($queue, false, true, false, false, false, $arguments);
-        $channel->queue_bind($queue, $exchange, $routingKey);
+        $channel->queue_declare($this->queue, false, true, false, false, false, $arguments);
+        $channel->queue_bind($this->queue, $this->exchange, $this->key);
 
         $channel->basic_qos(null, self::BATCH_SIZE, null);
-        $channel->basic_consume($queue, '', false, true, false, false, function (AMQPMessage $msg) use ($callback) {
+        $channel->basic_consume($this->queue, '', false, true, false, false, function (AMQPMessage $msg) use ($callback) {
             $data = json_decode($msg->getBody(), true);
             $this->buffer[] = $data;
 

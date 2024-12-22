@@ -14,34 +14,41 @@ class Withdraw {
         private TransactionRepositoryInterface $transactionRepository
     ) {}
 
-    public function execute(WithdrawDto $WithdrawDto): Response {
+    public function execute(WithdrawDto $withdrawDto): Response {
         try {
-            $accountOrigin = $this->origin($WithdrawDto);
+            $accountOrigin = $this->origin($withdrawDto);
 
             $this->accountRepository->save($accountOrigin);
-            $transactionEntity = new TransactionEntity(
+            $transactionEntity = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
-                $WithdrawDto->getType(),
-                $WithdrawDto->getValue(),
-                new \DateTime(),
-                $WithdrawDto->getDescription()
+                $withdrawDto->getType(),
+                $withdrawDto->getValue()
             );
+            $transactionEntity->setDescription($withdrawDto->getType());
             $this->transactionRepository->save($transactionEntity);
 
             return Response::success('Saque realizada com sucesso!');
         } catch (\Exception $e) {
-            return Response::error('Erro ao realizar transferência!');
+
+            $transactionEntity = TransactionEntity::transaction(
+                $withdrawDto->getNumberAccountOrigin(),
+                'withdraw',
+                $withdrawDto->getValue(),
+                $e->getMessage()
+            );
+            $this->transactionRepository->save($transactionEntity);
+            
+            return Response::error($e->getMessage());
         }
     }
 
-    private function origin(WithdrawDto $WithdrawDto): AccountEntity {
+    private function origin(WithdrawDto $withdrawDto): AccountEntity {
         $accountOrigin = $this->accountRepository->findByAccount(
-            $WithdrawDto->getNumberAccountOrigin()
+            $withdrawDto->getNumberAccountOrigin()
         );
 
         $accountOrigin->balance->debit(
-            $WithdrawDto->getValue(),
-            $accountOrigin->feeGenerate()
+            $withdrawDto->getValue(),
         );
         return new AccountEntity(
             $accountOrigin->numberAccount,

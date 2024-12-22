@@ -24,9 +24,12 @@ class AccountRepository implements AccountRepositoryInterface
 
     public function save(AccountEntity $accountEntity): void
     {
-        $this->model->where('number_account', $accountEntity->numberAccount)->update([
-            'balance' => $accountEntity->balance->value,
-            'created_at' => $accountEntity->createdAt,
-        ]);
+        $account = $this->model->where('number_account', $accountEntity->numberAccount)
+        ->lockForUpdate()
+        ->first();
+
+        $account->balance = $accountEntity->balance->value;
+        $account->created_at = $accountEntity->createdAt;
+        $account->save();
     }
 }

@@ -14,32 +14,39 @@ class Deposit {
         private TransactionRepositoryInterface $transactionRepository
     ) {}
 
-    public function execute(DepositDto $DepositDto): Response {
+    public function execute(DepositDto $depositDto): Response {
         try {
-            $accountOrigin = $this->origin($DepositDto);
+            $accountOrigin = $this->origin($depositDto);
             $this->accountRepository->save($accountOrigin);
-
-            $transactionEntity = new TransactionEntity(
+            $transactionEntity = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
-                $DepositDto->getType(),
-                $DepositDto->getValue(),
-                new \DateTime(),
-                $DepositDto->getDescription() 
+                $depositDto->getType(),
+                $depositDto->getValue()
             );
+            $transactionEntity->setDescription($depositDto->getType());
             $this->transactionRepository->save($transactionEntity);
 
             return Response::success('Depósito realizada com sucesso!');
         } catch (\Exception $e) {
-            return Response::error('Erro ao realizar transferência!');
+
+            $transactionEntity = TransactionEntity::transaction(
+                $depositDto->getNumberAccountOrigin(),
+                'deposit',
+                $depositDto->getValue(),
+                $e->getMessage()
+            );
+            $this->transactionRepository->save($transactionEntity);
+            
+            return Response::error($e->getMessage());
         }
     }
 
-    private function origin(DepositDto $DepositDto): AccountEntity {
+    private function origin(DepositDto $depositDto): AccountEntity {
         $accountOrigin = $this->accountRepository->findByAccount(
-            $DepositDto->getNumberAccountOrigin()
+            $depositDto->getNumberAccountOrigin()
         );
         
-        $accountOrigin->balance->credit($DepositDto->getValue());
+        $accountOrigin->balance->credit($depositDto->getValue());
         return new AccountEntity(
             $accountOrigin->numberAccount,
             $accountOrigin->balance,

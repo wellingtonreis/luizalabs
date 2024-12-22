@@ -6,9 +6,9 @@ use App\Src\Domain\Account\ValueObject\Balance;
 
 class AccountEntity {
     public function __construct(
-        public int $numberAccount,
-        public Balance $balance,
-        public \DateTime $createdAt,
+        public readonly int $numberAccount,
+        public readonly Balance $balance,
+        public readonly \DateTime $createdAt,
     ) {}
 
     public function getNumberAccount(): int {

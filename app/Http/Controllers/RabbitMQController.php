@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transfer;
+use App\Repositories\TransferFundsRepository;
 use App\Src\UseCases\Dto\TransferFunds\TransferFundsDto;
 use App\Src\UseCases\TransferFunds;
 
@@ -17,28 +17,41 @@ class RabbitMQController
 
     public function send(): JsonResponse
     {
-        $publisher = new RabbitMQPublisher();
-
-        Transfer::chunk(100, function ($transfers) use ($publisher) {
-            foreach ($transfers as $transfer) {
-                $data = $transfer->toArray();
-                $publisher->publish($data);
-            }
-        });
+        $pid = pcntl_fork();
+        if ($pid === -1) {
+            return response()->json(['error' => 'Erro ao iniciar consumidor'], 500);
+        } elseif ($pid === 0) {
+            $publisher = new RabbitMQPublisher(
+                env('RABBITMQ_EXCHANGE'),
+                env('RABBITMQ_QUEUE'),
+                env('RABBITMQ_QUEUE')
+            );
+            $transferFundsRepository = new TransferFundsRepository();
+            $transferFundsRepository->bach(
+                1000, 
+                function ($transfers) use ($publisher) {
+                foreach ($transfers as $transfer) {
+                    $data = $transfer->toArray();
+                    $publisher->publish($data);
+                }
+            });
+            exit(0);
+        }
 
         return response()->json(['success' => 'Mensagens enviadas com sucesso!'], 200);
     }
 
     public function consume(): JsonResponse
     {
-        $consumer = new RabbitMQConsumer();
-
+        $consumer = new RabbitMQConsumer(
+            env('RABBITMQ_EXCHANGE'),
+            env('RABBITMQ_QUEUE'),
+            env('RABBITMQ_QUEUE')
+        );
         $pid = pcntl_fork();
-
         if ($pid === -1) {
             return response()->json(['error' => 'Erro ao iniciar consumidor'], 500);
         } elseif ($pid === 0) {
-            $reply = [];
             $consumer->consume(function (array $data) {
                 Log::info('Consumindo mensagens...');
                 foreach ($data as $message) {
@@ -50,26 +63,10 @@ class RabbitMQController
                         $message['type'],
                         $message['description']
                     );
-                    $response = $this->transferFunds->execute($dto);
-            
-                    if(!$response->outcome) {
-
-                        array_push($reply, [
-                            'number_account_origin' => $dto->getNumberAccountOrigin(),
-                            'number_account_destination' => $dto->getNumberAccountDestination(),
-                            'amount' => $dto->getValue(),
-                            'description' => $dto->getDescription(),
-                            'created_at' => now(),
-                        ]);
-                    }
+                    $this->transferFunds->execute($dto);
                 }
-            }, function () use ($reply) {
+            }, function () {
                 Log::info('Consumidor finalizado');
-
-                if (!empty($reply)) {
-                    $publisher = new RabbitMQPublisher();
-                    $publisher->publish($reply);
-                }
             });
             exit(0);
         }

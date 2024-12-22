@@ -13,7 +13,7 @@ class Balance {
         $totalDebit = $value + $this->calculateFee($value, $feePercentage);
         
         if ($this->limitCredit() < $totalDebit) {
-            throw new \Exception('Saldo insuficiente');
+            throw new \Exception('Saldo insuficiênte');
         }
 
         $this->value -= $totalDebit;
