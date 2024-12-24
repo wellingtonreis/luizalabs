@@ -27,7 +27,7 @@ class Withdraw {
             $transactionEntity->setDescription($withdrawDto->getType());
             $this->transactionRepository->save($transactionEntity);
 
-            return Response::success('Saque realizada com sucesso!');
+            return Response::success('Saque realizado com sucesso!');
         } catch (\Exception $e) {
 
             $transactionEntity = TransactionEntity::transaction(

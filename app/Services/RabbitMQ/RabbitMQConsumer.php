@@ -26,7 +26,7 @@ class RabbitMQConsumer
         $channel->queue_declare($this->queue, false, true, false, false, false, $arguments);
         $channel->queue_bind($this->queue, $this->exchange, $this->key);
 
-        $channel->basic_qos(null, self::BATCH_SIZE, null);
+        $channel->basic_qos(0, self::BATCH_SIZE, false);
         $channel->basic_consume($this->queue, '', false, true, false, false, function (AMQPMessage $msg) use ($callback) {
             $data = json_decode($msg->getBody(), true);
             $this->buffer[] = $data;

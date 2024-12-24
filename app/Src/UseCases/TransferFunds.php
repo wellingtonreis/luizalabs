@@ -18,6 +18,10 @@ class TransferFunds {
 
     public function execute(TransferFundsDto $transferFundsDto): Response {
         try {
+            if ($transferFundsDto->getNumberAccountOrigin() === $transferFundsDto->getNumberAccountDestination()) {
+                return Response::error('Conta de origem e destino não podem ser iguais!');
+            }
+
             $this->unitOfWork->begin();
 
             $accountOrigin = $this->origin($transferFundsDto);
@@ -48,9 +52,8 @@ class TransferFunds {
             $this->unitOfWork->commit();
             return Response::success('Transferência realizada com sucesso!');
         } catch (\Exception $e) {
-
+            
             $this->unitOfWork->rollback();
-
             // SALVA TRANSAÇÃO NA CONTA ORIGEM COM A EXCEÇÃO
             TransactionEntity::transaction(
                 $transferFundsDto->getNumberAccountOrigin(),
@@ -58,7 +61,7 @@ class TransferFunds {
                 $transferFundsDto->getValue(),
                 $e->getMessage()
             );
-            return Response::error('Erro ao realizar transferência!');
+            return Response::error($e->getMessage());
         }
     }
 

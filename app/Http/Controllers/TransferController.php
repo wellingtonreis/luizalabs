@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Src\UseCases\TransferFunds;
 use App\Src\UseCases\Dto\TransferFunds\TransferFundsDto;
+use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
 
 class TransferController extends Controller
 {
@@ -24,11 +25,9 @@ class TransferController extends Controller
         );
 
         if ($response->outcome) {
-            return response()->json(['success' => $response->message], 200);
+            return response()->json(['success' => $response->message], ResponseStatusCode::HTTP_OK);
         }
 
-        if(!$response->outcome) {
-            return response()->json(['error' => $response->message], 422);
-        }
+        return response()->json(['error' => $response->message], ResponseStatusCode::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

@@ -2,7 +2,7 @@
 
 use App\Src\Domain\Account\Entity\AccountEntity;
 use App\Src\Domain\Account\ValueObject\Balance;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class AccountEntityTest extends TestCase
 {

@@ -1,7 +1,7 @@
 <?php
 
 use App\Src\Domain\Transaction\Entity\TransactionEntity;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class TransactionEntityTest extends TestCase
 {

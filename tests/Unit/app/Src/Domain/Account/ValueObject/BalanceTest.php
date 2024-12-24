@@ -1,7 +1,7 @@
 <?php
 
 use App\Src\Domain\Account\ValueObject\Balance;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class BalanceTest extends TestCase
 {

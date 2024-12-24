@@ -10,6 +10,7 @@ use App\Services\RabbitMQ\RabbitMQConsumer;
 use App\Services\RabbitMQ\RabbitMQPublisher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
 
 class RabbitMQController
 {
@@ -19,12 +20,14 @@ class RabbitMQController
     {
         $pid = pcntl_fork();
         if ($pid === -1) {
-            return response()->json(['error' => 'Erro ao iniciar consumidor'], 500);
+            return response()->json(['error' => 'Erro ao iniciar consumidor'], ResponseStatusCode::HTTP_INTERNAL_SERVER_ERROR);
         } elseif ($pid === 0) {
+
+            $config = config('queue.rabbitmq');
             $publisher = new RabbitMQPublisher(
-                env('RABBITMQ_EXCHANGE'),
-                env('RABBITMQ_QUEUE'),
-                env('RABBITMQ_QUEUE')
+                $config['exchange'],
+                $config['queue'],
+                $config['queue']
             );
             $transferFundsRepository = new TransferFundsRepository();
             $transferFundsRepository->bach(
@@ -38,19 +41,20 @@ class RabbitMQController
             exit(0);
         }
 
-        return response()->json(['success' => 'Mensagens enviadas com sucesso!'], 200);
+        return response()->json(['success' => 'Mensagens enviadas com sucesso!'], ResponseStatusCode::HTTP_OK);
     }
 
     public function consume(): JsonResponse
     {
+        $config = config('queue.rabbitmq');
         $consumer = new RabbitMQConsumer(
-            env('RABBITMQ_EXCHANGE'),
-            env('RABBITMQ_QUEUE'),
-            env('RABBITMQ_QUEUE')
+            $config['exchange'],
+            $config['queue'],
+            $config['queue']
         );
         $pid = pcntl_fork();
         if ($pid === -1) {
-            return response()->json(['error' => 'Erro ao iniciar consumidor'], 500);
+            return response()->json(['error' => 'Erro ao iniciar consumidor'], ResponseStatusCode::HTTP_INTERNAL_SERVER_ERROR);
         } elseif ($pid === 0) {
             $consumer->consume(function (array $data) {
                 Log::info('Consumindo mensagens...');
@@ -71,6 +75,6 @@ class RabbitMQController
             exit(0);
         }
 
-        return response()->json(['message' => 'Consumidor iniciado em background'], 200);
+        return response()->json(['message' => 'Consumidor iniciado em background'], ResponseStatusCode::HTTP_OK);
     }
 }

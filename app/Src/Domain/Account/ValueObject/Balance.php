@@ -10,6 +10,10 @@ class Balance {
 
     public function debit(float $value, float $feePercentage = 0.0): void {
 
+        if ($value < 0) {
+            throw new \Exception('Saque não pode ser negativo!');
+        }
+
         $totalDebit = $value + $this->calculateFee($value, $feePercentage);
         
         if ($this->limitCredit() < $totalDebit) {
@@ -20,6 +24,11 @@ class Balance {
     }
 
     public function credit(float $value): void {
+
+        if ($value < 0) {
+            throw new \Exception('Depósito não pode ser negativo');
+        }
+
         $this->value += $value;
     }
 
@@ -29,7 +38,7 @@ class Balance {
         return $this->value + $this->limitCredit;
     }
 
-    public function exceedLimitCredit(int $limitCredit): bool {
+    public function exceedLimitCredit(float $limitCredit): bool {
 
         if ($this->value <= ($limitCredit * -1)) {
             throw new \Exception('Limite de crédito excedido');

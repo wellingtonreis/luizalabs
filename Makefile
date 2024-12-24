@@ -1,18 +1,15 @@
-start-app:
-	docker exec -it laravel-app /bin/bash -c "php artisan migrate && php artisan db:seed && exit"
-
 start-job:
-	docker exec -it laravel-app /bin/bash -c "php artisan queue:work --queue=rabbitmq --once && exit"
-
-generante-transfers:
-	docker exec -it laravel-app /bin/bash -c "php artisan db:seed && exit"
+	php artisan queue:work --queue=rabbitmq --once
 
 test:
 	./vendor/bin/phpunit
 
 test-file:
-	./vendor/bin/phpunit $(file)
+	./vendor/bin/phpunit --testdox $(file)
 
+phpstan:
+	./vendor/bin/phpstan analyse --memory-limit=1G
+	
 serve:
 	php artisan serve
 
@@ -21,6 +18,9 @@ migrate:
 
 seed:
 	php artisan db:seed
+
+migrations:
+	php artisan migrate && php artisan db:seed
 
 cache-clear:
 	php artisan cache:clear
@@ -35,7 +35,7 @@ view-clear:
 	php artisan view:clear
 
 view-logs:
-	docker exec -it laravel-app /bin/bash -c "tail -f storage/logs/laravel.log"
+	tail -f storage/logs/laravel.log
 
 logs-clear:
-	docker exec -it laravel-app /bin/bash -c "truncate -s 0 storage/logs/laravel.log"
+	truncate -s 0 storage/logs/laravel.log

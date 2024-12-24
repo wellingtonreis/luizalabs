@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Src\UseCases\Deposit;
 use App\Src\UseCases\Dto\Deposit\DepositDto;
+use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
 
 class DepositController extends Controller
 {
@@ -22,12 +23,10 @@ class DepositController extends Controller
             )
         );
 
-        if ($response->outcome) {
-            return response()->json(['success' => $response->message], 200);
+        if ($response->outcome === true) {
+            return response()->json(['success' => $response->message], ResponseStatusCode::HTTP_OK);
         }
 
-        if(!$response->outcome) {
-            return response()->json(['error' => $response->message], 422);
-        }
+        return response()->json(['error' => $response->message], ResponseStatusCode::HTTP_UNPROCESSABLE_ENTITY);
     }
 }

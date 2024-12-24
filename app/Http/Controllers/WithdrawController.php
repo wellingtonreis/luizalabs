@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Src\UseCases\Withdraw;
 use App\Src\UseCases\Dto\Withdraw\WithdrawDto;
+use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
 
 class WithdrawController extends Controller
 {
@@ -23,11 +24,9 @@ class WithdrawController extends Controller
         );
 
         if ($response->outcome) {
-            return response()->json(['success' => $response->message], 200);
+            return response()->json(['success' => $response->message], ResponseStatusCode::HTTP_OK);
         }
 
-        if(!$response->outcome) {
-            return response()->json(['error' => $response->message], 422);
-        }
+        return response()->json(['error' => $response->message], ResponseStatusCode::HTTP_UNPROCESSABLE_ENTITY);
     }
 }
