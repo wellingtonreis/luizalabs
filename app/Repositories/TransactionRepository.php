@@ -16,6 +16,7 @@ class TransactionRepository implements TransactionRepositoryInterface
             'number_account' => $transaction->numberAccount,
             'type' => $transaction->type,
             'value' => $transaction->value,
+            'status' => $transaction->status,
             'created_at' => $transaction->createdAt,
             'description' => $transaction->description,
         ]);

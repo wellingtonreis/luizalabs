@@ -56,14 +56,17 @@ class TransferFunds {
         } catch (\Exception $e) {
             
             $this->unitOfWork->rollback();
+            
             // SALVA TRANSAÇÃO NA CONTA ORIGEM COM A EXCEÇÃO
-            TransactionEntity::transaction(
+            $transactionEntity = TransactionEntity::transaction(
                 $transferFundsDto->getNumberAccountOrigin(),
                 'transfer',
                 $transferFundsDto->getValue(),
                 'failed',
                 $e->getMessage()
             );
+            $this->transactionRepository->save($transactionEntity);
+
             return Response::error($e->getMessage());
         }
     }

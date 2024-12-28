@@ -56,8 +56,8 @@ class RabbitMQController
         if ($pid === -1) {
             return response()->json(['error' => 'Erro ao iniciar consumidor'], ResponseStatusCode::HTTP_INTERNAL_SERVER_ERROR);
         } elseif ($pid === 0) {
+            Log::info('Consumindo mensagens...');
             $consumer->consume(function (array $data) {
-                Log::info('Consumindo mensagens...');
                 foreach ($data as $message) {
 
                     $dto = new TransferFundsDto(
