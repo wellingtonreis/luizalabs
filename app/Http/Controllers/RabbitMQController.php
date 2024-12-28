@@ -23,7 +23,7 @@ class RabbitMQController
             return response()->json(['error' => 'Erro ao iniciar consumidor'], ResponseStatusCode::HTTP_INTERNAL_SERVER_ERROR);
         } elseif ($pid === 0) {
 
-            $config = config('queue.rabbitmq');
+            $config = config('queue.connections.rabbitmq');
             $publisher = new RabbitMQPublisher(
                 $config['exchange'],
                 $config['queue'],
@@ -46,7 +46,7 @@ class RabbitMQController
 
     public function consume(): JsonResponse
     {
-        $config = config('queue.rabbitmq');
+        $config = config('queue.connections.rabbitmq');
         $consumer = new RabbitMQConsumer(
             $config['exchange'],
             $config['queue'],

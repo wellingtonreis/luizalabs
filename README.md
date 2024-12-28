@@ -1,66 +1,137 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Desafio Técnico Luizalabs - Sistema de Gestão de Conta Corrente
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Contexto
+Você está desenvolvendo um sistema de gestão de conta corrente para um banco. O sistema deve suportar uma série de operações e regras complexas para gerenciar as contas e transações dos clientes.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requisitos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Modelagem de Dados
+- Crie um modelo de dados para representar uma conta corrente. Cada conta deve ter:
+  - Número único
+  - Saldo
+  - Data de criação
+  - Lista de transações
+- As transações devem incluir:
+  - Tipo (depósito, saque, transferência)
+  - Valor
+  - Data
+  - Descrição opcional
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Regras de Negócio
+- **Limite de Crédito**: 
+  - As contas podem ter um limite de crédito que deve ser respeitado durante as transações. 
+  - O saldo disponível deve considerar o limite de crédito.
+- **Taxas e Tarifas**: 
+  - As retiradas e transferências podem incorrer em taxas que devem ser aplicadas automaticamente.
+- **Transferências**:
+  - Devem ser atômicas, garantindo que o saldo seja debitado da conta de origem e creditado na conta de destino em uma única operação.
 
-## Learning Laravel
+### 3. Processamento de Transações
+- Implemente um método para processar uma lista de transações em lote.
+- Cada transação deve ser validada e aplicada ao saldo da conta conforme as regras de negócio.
+- Caso uma transação falhe (ex.: saldo insuficiente):
+  - Ela deve ser registrada.
+  - A operação completa deve ser revertida para manter a integridade dos dados.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 4. Concorrência e Desempenho
+- O sistema deve suportar múltiplas transações simultâneas em uma conta.
+- Implemente mecanismos de bloqueio ou sincronização para evitar inconsistências durante operações concorrentes.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 5. Auditoria e Log
+- Mantenha um log detalhado de todas as transações e alterações no saldo.
+- O log deve ser consultável e permitir auditorias futuras.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Entrega
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 1. Código-Fonte
+- Forneça o código-fonte para:
+  - Modelo de dados
+  - Lógica de transações
+  - Métodos de processamento
+  - Endpoints (API REST).
 
-### Premium Partners
+### 2. Casos de Teste
+- Crie testes unitários e de integração abrangentes para validar:
+  - Funcionalidades
+  - Regras de negócio
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+---
 
-## Contributing
+## Desafio Adicional
+### Recuperação de Falhas
+Proponha uma estratégia para recuperação de falhas em casos onde o sistema possa falhar durante o processamento de uma transação. 
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Como garantir que o sistema possa se recuperar sem perda de dados ou inconsistências?**
 
-## Code of Conduct
+- Utilize abordagens como:
+  - **Logs de Transações**: 
+    - Registre todas as operações em um log transacional.
+    - Permita replays para restaurar o estado do sistema.
+  - **Banco de Dados com Suporte a Transações**: 
+    - Garanta operações ACID (Atomicidade, Consistência, Isolamento, Durabilidade).
+  - **Mecanismos de Retry**: 
+    - Configure políticas de retry para transações falhadas.
+  - **Snapshots de Estado**:
+    - Periodicamente, salve o estado atual das contas para recuperação em caso de falhas críticas.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Como Executar
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Clone este repositório:
+   ```bash
+   git clone <url-do-repositorio>
+   ```
+2. Configure o ambiente:
+   - Renomeie `.env.example` para `.env` e configure as credenciais do banco de dados.
+3. Inicie docker:
+   ```bash
+   docker-compose up -d --build
+   ```
+4. Execute as migrações:
+   ```bash
+   make migrate
+   ```
+5. Gere os dados:
+   ```bash
+   make seed
+   ```
+6. Teste as funcionalidades com os endpoints disponíveis em api/.
+7. Execute os teste de unidade:
+   ```bash
+   make test
+   ```
+8. Execute analise do código:
+   ```bash
+   make phpstan
+   ```
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Estrutura de Diretórios
+- `app/Models`:
+  - Modelos para Conta e Transações
+- `app/Src`:
+  - Regras de negócio e lógica de transações
+- `app/Http/Controllers`:
+  - Endpoints para as operações de conta e transações
+- `tests/`:
+  - Casos de teste unitários e de integração
+
+---
+
+## Tecnologias Utilizadas
+- Laravel 11
+- PHP 8.2
+- MySQL/PostgreSQL
+- PHPUnit
+- Docker
+
+---
+
+## Autor
+Desenvolvido por Wellington Reis.
