@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('number_account');
             $table->enum('type', ['deposit', 'withdraw', 'transfer']);
             $table->decimal('value', 8, 2);
+            $table->enum('status', ['completed', 'pending', 'failed']);
             $table->timestamp('created_at');
             $table->string('description');
         });

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\DepositRequest;
 use App\Src\UseCases\Deposit;
 use App\Src\UseCases\Dto\Deposit\DepositDto;
 use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
@@ -12,7 +12,7 @@ class DepositController extends Controller
 {
     public function __construct(private Deposit $deposit){}
 
-    public function deposit(Request $request)
+    public function deposit(DepositRequest $request)
     {
         $response = $this->deposit->execute(
             new DepositDto(

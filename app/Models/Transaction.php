@@ -14,6 +14,7 @@ class Transaction extends Model
         'number_account',
         'type',
         'value',
+        'status',
         'created_at',
         'description',
     ];

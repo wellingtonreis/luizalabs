@@ -14,6 +14,7 @@ class TransactionFactory extends Factory
             'number_account' => $account->number_account,
             'type' => $this->faker->randomElement(['deposit', 'withdraw', 'transfer']),
             'value' => $this->faker->randomFloat(2, 0, 10000),
+            'status' => $this->faker->randomElement(['completed', 'pending', 'failed']),
             'created_at' => now(),
             'description' => $this->faker->sentence(6),
         ];

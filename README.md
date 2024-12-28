@@ -110,7 +110,26 @@ Proponha uma estratégia para recuperação de falhas em casos onde o sistema po
    make phpstan
    ```
 
+9. Passos principais na seguinte ordem de execução:
+  ```bash
+   $ docker-compose up -d --build
+
+   $ docker exec -it laravel-app bash
+
+   $ make migrate
+
+   $ make seed
+   ```
+
+10. Execute os endpoints em api/api_rabbitmq.http para simular a carga de transações:
+   
+   http://localhost:8000/api/v1/send-transfer-message-to-rabbitmq
+
+   http://localhost:8000/api/v1/consume-transfer-messages
 ---
+
+11. Visualize as mensagens no rabbitmq:
+   http://localhost:15672/
 
 ## Estrutura de Diretórios
 - `app/Models`:

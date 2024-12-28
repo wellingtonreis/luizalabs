@@ -21,7 +21,8 @@ class Deposit {
             $transactionEntity = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
                 $depositDto->getType(),
-                $depositDto->getValue()
+                $depositDto->getValue(),
+                'completed'
             );
             $transactionEntity->setDescription($depositDto->getType());
             $this->transactionRepository->save($transactionEntity);
@@ -33,6 +34,7 @@ class Deposit {
                 $depositDto->getNumberAccountOrigin(),
                 'deposit',
                 $depositDto->getValue(),
+                'failed',
                 $e->getMessage()
             );
             $this->transactionRepository->save($transactionEntity);

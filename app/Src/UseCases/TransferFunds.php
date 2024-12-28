@@ -33,7 +33,8 @@ class TransferFunds {
             $transAccount = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
                 $transferFundsDto->getType(),
-                $transferFundsDto->getValue()
+                $transferFundsDto->getValue(),
+                'completed'
             );
             $transAccount->setDescription($transferFundsDto->getType());
             $this->transactionRepository->save($transAccount);
@@ -44,7 +45,8 @@ class TransferFunds {
             $transDestination = TransactionEntity::transaction(
                 $accountDestination->getNumberAccount(),
                 $transferFundsDto->getType(),
-                $transferFundsDto->getValue()
+                $transferFundsDto->getValue(),
+                'completed'
             );
             $transDestination->setDescription($transferFundsDto->getType());
             $this->transactionRepository->save($transDestination);
@@ -59,6 +61,7 @@ class TransferFunds {
                 $transferFundsDto->getNumberAccountOrigin(),
                 'transfer',
                 $transferFundsDto->getValue(),
+                'failed',
                 $e->getMessage()
             );
             return Response::error($e->getMessage());

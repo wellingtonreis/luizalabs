@@ -14,7 +14,8 @@ class TransactionEntityTest extends TestCase
         $transaction = TransactionEntity::transaction(
             $numberAccount, 
             $type, 
-            $value, 
+            $value,
+            'completed',
             $description
         );
 
@@ -38,7 +39,8 @@ class TransactionEntityTest extends TestCase
         $transaction = TransactionEntity::transaction(
             $numberAccount, 
             $type, 
-            $value
+            $value,
+            'completed'
         );
 
         $transaction->setDescription($type);
@@ -53,7 +55,8 @@ class TransactionEntityTest extends TestCase
         $transaction = TransactionEntity::transaction(
             $numberAccount, 
             $type, 
-            $value
+            $value,
+            'completed'
         );
 
         $transaction->setDescription($type);
@@ -68,7 +71,8 @@ class TransactionEntityTest extends TestCase
         $transaction = TransactionEntity::transaction(
             $numberAccount, 
             $type, 
-            $value
+            $value,
+            'completed'
         );
 
         $transaction->setDescription('transfer');
@@ -83,7 +87,8 @@ class TransactionEntityTest extends TestCase
         $transaction = TransactionEntity::transaction(
             $numberAccount, 
             $type, 
-            $value
+            $value,
+            'completed'
         );
 
         $transaction->setDescription('test');

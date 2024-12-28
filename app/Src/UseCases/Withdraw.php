@@ -22,7 +22,8 @@ class Withdraw {
             $transactionEntity = TransactionEntity::transaction(
                 $accountOrigin->getNumberAccount(),
                 $withdrawDto->getType(),
-                $withdrawDto->getValue()
+                $withdrawDto->getValue(),
+                'completed'
             );
             $transactionEntity->setDescription($withdrawDto->getType());
             $this->transactionRepository->save($transactionEntity);
@@ -34,6 +35,7 @@ class Withdraw {
                 $withdrawDto->getNumberAccountOrigin(),
                 'withdraw',
                 $withdrawDto->getValue(),
+                'failed',
                 $e->getMessage()
             );
             $this->transactionRepository->save($transactionEntity);

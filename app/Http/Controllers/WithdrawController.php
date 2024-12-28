@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\WithdrawRequest;
 use App\Src\UseCases\Withdraw;
 use App\Src\UseCases\Dto\Withdraw\WithdrawDto;
 use Symfony\Component\HttpFoundation\Response as ResponseStatusCode;
@@ -12,7 +12,7 @@ class WithdrawController extends Controller
 {
     public function __construct(private Withdraw $withdraw){}
 
-    public function withdraw(Request $request)
+    public function withdraw(WithdrawRequest $request)
     {
         $response = $this->withdraw->execute(
             new WithdrawDto(

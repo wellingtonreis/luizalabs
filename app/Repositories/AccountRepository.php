@@ -15,6 +15,10 @@ class AccountRepository implements AccountRepositoryInterface
     {
         $account = $this->model->where('number_account', $numberAccount)->first();
 
+        if (!$account) {
+            throw new \Exception('Conta não encontrada');
+        }
+
         return new AccountEntity(
             $account->number_account,
             new Balance($account->balance, $account->limit_credit),

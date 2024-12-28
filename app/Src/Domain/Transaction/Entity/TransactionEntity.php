@@ -7,20 +7,42 @@ class TransactionEntity {
         public int $numberAccount,
         public string $type,
         public float $value,
+        public string $status,
         public \DateTime $createdAt,
-        public string|null $description
+        public ?string $description
     ) {}
 
     public static function transaction(
         int $numberAccount,
         string $type,
         float $value,
-        string|null $description = null
+        string $status,
+        ?string $description = null
     ): self {
+
+        $typeEnum = match ($type) {
+            'withdraw' => 'withdraw',
+            'deposit' => 'deposit',
+            'transfer' => 'transfer',
+            default => null,
+        };
+
+        if (empty($typeEnum)) {
+            throw new \InvalidArgumentException('Tipo de transação inválida!');
+        }
+
+        $statusEnum = match ($status) {
+            'completed' => 'completed',
+            'pending' => 'pending',
+            'failed' => 'failed',
+            default => 'pending',
+        };
+
         return new self(
             $numberAccount,
-            $type,
+            $typeEnum,
             $value,
+            $statusEnum,
             new \DateTime(),
             $description
         );
